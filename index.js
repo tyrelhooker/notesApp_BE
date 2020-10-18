@@ -1,0 +1,81 @@
+const express = require('express');
+const db = require("./db.json");
+const morgan = require('morgan');
+const cors = require('cors');
+
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(cors());
+
+morgan.token('reqBody', (req, res) => JSON.stringify(req.body))
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :reqBody'));
+
+// Global Variables and Functions
+let notes = db.notes.map(note => note);
+console.log(notes);
+
+const generateRandomId = () => Math.floor(Math.random() * 10000 + 1);
+
+// ROUTES
+app.get('/api/notes', (req, res) => {
+  res.json(notes);
+})
+
+app.get('/info', (req, res) => {
+  const totalnotes = notes.length;
+  console.log(totalnotes);
+  // console.log(notes.length)
+  const calcDate = new Date();
+  
+  res.send(
+    `<p>Notebook has info for ${totalnotes} people.</p>
+    <p>${calcDate}</p>`
+  )
+})
+
+app.get('/api/notes/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const note = notes.find(note => note.id === id);
+
+  if(note) {
+    res.json(note)
+  } else {
+    res.status(404).end();
+  }
+})
+
+app.delete('/api/notes/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const newnotes = notes.filter(note => note.id !== id);
+  notes = newnotes;
+  console.log(notes);
+
+  res.status(404).send('note deleted').end();
+})
+
+app.post('/api/notes', (req, res) => {
+  const body = req.body;
+  // console.log(body);
+
+  if(!body.content) {
+    return response.status(400).json({ error: 'content missing'})
+  }
+
+  const note = {
+    id: generateRandomId(),
+    content: body.content,
+    date: new Date(),
+    important: body.important || false
+  }
+
+  notes = notes.concat(note);
+  console.log(notes);
+
+  res.json(note);
+})
+
+const PORT = 3001;
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
