@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:ui": "rm -rf build && cd ../notesapp_fe && npm run build --prod && cp -r build ../notesapp_be",
+    "deploy": "git push heroku master",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibild && npm run deplot",
+    "logs:prod": "heroku logs --tail"
   },
   "repository": {
     "type": "git",
@@ -19,6 +23,7 @@
     "url": "https://github.com/tyrelhooker/notesapp_be/issues"
   },
   "homepage": "https://github.com/tyrelhooker/notesapp_be#readme",
+  "heroku": "https://sheltered-thicket-76122.herokuapp.com/",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",

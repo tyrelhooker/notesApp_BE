@@ -15,7 +15,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :r
 
 // Global Variables and Functions
 let notes = db.notes.map(note => note);
-console.log(notes);
+// console.log(notes);
 
 const generateRandomId = () => Math.floor(Math.random() * 10000 + 1);
 
@@ -75,6 +75,27 @@ app.post('/api/notes', (req, res) => {
   console.log(notes);
 
   res.json(note);
+})
+
+app.put('/api/notes/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const body = req.body;
+  // console.log(body);
+
+  const note = {
+    id: body.id,
+    content: body.content,
+    date: body.date,
+    important: body.important
+  }
+
+  console.log("beforeFind", notes);
+
+  notes.find(n => n.id === id).important = note.important;
+  
+  console.log("afterFind:", notes);
+  
+  res.json(note)
 })
 
 const PORT = process.env.PORT || 3001;
