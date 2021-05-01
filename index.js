@@ -42,16 +42,18 @@ app.get('/api/notes', (req, res) => {
 //   )
 // })
 
-// app.get('/api/notes/:id', (req, res) => {
-//   const id = Number(req.params.id);
-//   const note = notes.find(note => note.id === id);
-
-//   if(note) {
-//     res.json(note)
-//   } else {
-//     res.status(404).end();
-//   }
-// })
+app.get('/api/notes/:id', (req, res) => {
+  Note.findById(req.params.id)
+    .then(note => {
+      if(note) {
+        res.json(note)
+      } else {
+        res.status(404).end();
+      }
+    })
+  // const id = Number(req.params.id);
+  // const note = notes.find(note => note.id === id);
+})
 
 // app.delete('/api/notes/:id', (req, res) => {
 //   const id = Number(req.params.id);
@@ -62,47 +64,54 @@ app.get('/api/notes', (req, res) => {
 //   res.status(404).send('note deleted').end();
 // })
 
-// app.post('/api/notes', (req, res) => {
-//   const body = req.body;
-//   // console.log(body);
+app.post('/api/notes', (req, res) => {
+  const body = req.body;
+  // console.log(body);
 
-//   if(!body.content) {
-//     return response.status(400).json({ error: 'content missing'})
-//   }
+  if(!body.content) {
+    return res.status(400).json({ error: 'content missing'})
+  }
 
-//   const note = {
-//     id: generateRandomId(),
-//     content: body.content,
-//     date: new Date(),
-//     important: body.important || false
-//   }
+  const note = new Note({
+    content: body.content,
+    date: new Date(),
+    important: body.important || false
+  })
 
-//   notes = notes.concat(note);
-//   // console.log(notes);
+  note.save().then(savedNote => {
+    res.json(savedNote)
+  })
+})
 
-//   res.json(note);
-// })
+app.put('/api/notes/:id', (req, res) => {
+  const body = req.body;
 
-// app.put('/api/notes/:id', (req, res) => {
-//   const id = Number(req.params.id);
-//   const body = req.body;
-//   // console.log(body);
+  Note.findById(req.params.id)
+    .then(note => {
+      note.important = body.important
+      note.save().then(changedNote => {
+        res.json(changedNote);
+      })
+    })
+  // const id = Number(req.params.id);
+  // const body = req.body;
+  // // console.log(body);
 
-//   const note = {
-//     id: body.id,
-//     content: body.content,
-//     date: body.date,
-//     important: body.important
-//   }
+  // const note = {
+  //   id: body.id,
+  //   content: body.content,
+  //   date: body.date,
+  //   important: body.important
+  // }
 
-//   console.log("beforeFind", notes);
+  // console.log("beforeFind", notes);
 
-//   notes.find(n => n.id === id).important = note.important;
+  // notes.find(n => n.id === id).important = note.important;
   
-//   console.log("afterFind:", notes);
+  // console.log("afterFind:", notes);
   
-//   res.json(note)
-// })
+  // res.json(note)
+})
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
