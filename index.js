@@ -4,24 +4,19 @@ const db = require("./db.json");
 const morgan = require('morgan');
 const cors = require('cors');
 const Note = require('./models/note');
+const { response } = require('express');
 
 
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(cors());
+// MIDDLEWARE
 app.use(express.static('build'));
+app.use(express.json());
 
 morgan.token('reqBody', (req, res) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :reqBody'));
 
-// Global Variables and Functions
-// let notes = db.notes.map(note => note);
-// console.log(notes);
-
-// const generateRandomId = () => Math.floor(Math.random() * 10000 + 1);
 
 // ROUTES
 app.get('/api/notes', (req, res) => {
@@ -45,14 +40,16 @@ app.get('/api/notes', (req, res) => {
 app.get('/api/notes/:id', (req, res) => {
   Note.findById(req.params.id)
     .then(note => {
-      if(note) {
+      if (note) {
         res.json(note)
       } else {
         res.status(404).end();
       }
     })
-  // const id = Number(req.params.id);
-  // const note = notes.find(note => note.id === id);
+    .catch(error => {
+      console.log(error);
+      res.status(400).send({ error: 'malformatted id' });
+    })
 })
 
 // app.delete('/api/notes/:id', (req, res) => {
